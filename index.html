@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>freakykaka — Roblox Studio Dev</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sunset-amber:#F2A65A;
+    --sunset-coral:#E8785A;
+    --ice-blue:#8FB8D9;
+    --deep-navy:#14233B;
+    --frost-white:#F4F8FC;
+    --ink:#0B1220;
+    --glass-bg: rgba(20, 35, 59, 0.42);
+    --glass-border: rgba(244, 248, 252, 0.16);
+    --radius: 18px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:'Inter', sans-serif;
+    color:var(--frost-white);
+    background:#0c1524;
+    overflow-x:hidden;
+  }
+  .bg-fixed{
+    position:fixed;
+    inset:0;
+    background-image:url('bg-mountains.png');
+    background-size:cover;
+    background-position:center;
+    z-index:-2;
+  }
+  .bg-overlay{
+    position:fixed;
+    inset:0;
+    background:linear-gradient(180deg, rgba(11,18,32,0.35) 0%, rgba(11,18,32,0.55) 40%, rgba(11,18,32,0.85) 100%);
+    z-index:-1;
+  }
+
+  ::selection{ background:var(--sunset-coral); color:var(--ink); }
+
+  h1,h2,h3{ font-family:'Space Grotesk', sans-serif; margin:0; }
+  a{ color:inherit; }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--sunset-amber);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:8px; height:8px;
+    background:var(--sunset-amber);
+    display:inline-block;
+    border-radius:2px;
+    transform:rotate(45deg);
+  }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 5vw;
+    background:rgba(11,18,32,0.28);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--glass-border);
+  }
+  .brand{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:1.15rem;
+    letter-spacing:0.02em;
+  }
+  .brand span{ color:var(--sunset-amber); }
+  .nav-links{
+    display:flex;
+    gap:28px;
+    font-size:0.92rem;
+    font-weight:500;
+  }
+  .nav-links a{
+    text-decoration:none;
+    opacity:0.85;
+    transition:opacity 0.2s, color 0.2s;
+  }
+  .nav-links a:hover{ opacity:1; color:var(--sunset-amber); }
+  .nav-icons{ display:flex; gap:14px; }
+  .nav-icons a{
+    width:36px; height:36px;
+    display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--glass-border);
+    border-radius:10px;
+    background:rgba(255,255,255,0.05);
+    transition:transform 0.2s, background 0.2s;
+  }
+  .nav-icons a:hover{ transform:translateY(-2px); background:rgba(242,166,90,0.18); }
+  .nav-icons svg{ width:17px; height:17px; fill:var(--frost-white); }
+  @media (max-width:760px){ .nav-links{ display:none; } }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    padding:0 6vw;
+    position:relative;
+  }
+  .hero-tag{ margin-bottom:18px; }
+  .hero h1{
+    font-size:clamp(2.8rem, 8vw, 6.2rem);
+    line-height:0.98;
+    font-weight:700;
+    text-shadow:0 4px 40px rgba(0,0,0,0.35);
+  }
+  .hero h1 .accent{
+    background:linear-gradient(100deg, var(--sunset-amber), var(--sunset-coral));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .hero-sub{
+    max-width:520px;
+    margin-top:22px;
+    font-size:1.08rem;
+    line-height:1.6;
+    color:rgba(244,248,252,0.88);
+  }
+  .cube-row{ display:flex; gap:6px; margin-top:6px; }
+  .cube-row span{
+    width:9px; height:9px;
+    background:var(--ice-blue);
+    opacity:0.7;
+    border-radius:2px;
+  }
+  .cube-row span:nth-child(2){ background:var(--sunset-amber); }
+  .cube-row span:nth-child(3){ background:var(--sunset-coral); }
+
+  .hero-ctas{
+    display:flex;
+    gap:14px;
+    margin-top:34px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:0.92rem;
+    padding:13px 24px;
+    border-radius:12px;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    transition:transform 0.2s ease, box-shadow 0.2s ease;
+    border:1px solid transparent;
+  }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn-primary{
+    background:linear-gradient(100deg, var(--sunset-amber), var(--sunset-coral));
+    color:var(--ink);
+    box-shadow:0 8px 30px rgba(232,120,90,0.28);
+  }
+  .btn-ghost{
+    background:rgba(255,255,255,0.06);
+    border-color:var(--glass-border);
+    backdrop-filter:blur(10px);
+    color:var(--frost-white);
+  }
+  .btn-ghost:hover{ background:rgba(255,255,255,0.12); }
+
+  .scroll-hint{
+    position:absolute;
+    bottom:36px; left:6vw;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.75rem;
+    opacity:0.6;
+    display:flex; align-items:center; gap:8px;
+  }
+  .scroll-hint .line{ width:28px; height:1px; background:var(--frost-white); opacity:0.6; }
+
+  /* ---------- SECTION WRAPPER ---------- */
+  section{
+    position:relative;
+    padding:110px 6vw;
+    max-width:1180px;
+    margin:0 auto;
+  }
+  .section-head{ margin-bottom:48px; max-width:640px; }
+  .section-head h2{
+    font-size:clamp(1.9rem, 4vw, 2.7rem);
+    margin-top:14px;
+    font-weight:700;
+  }
+
+  /* glass panel */
+  .glass{
+    background:var(--glass-bg);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    box-shadow:0 20px 60px rgba(0,0,0,0.25);
+  }
+
+  /* ---------- ABOUT ---------- */
+  .about-grid{
+    display:grid;
+    grid-template-columns:1.05fr 0.95fr;
+    gap:34px;
+    align-items:stretch;
+  }
+  @media (max-width:860px){ .about-grid{ grid-template-columns:1fr; } }
+  .about-copy{ padding:38px; }
+  .about-copy p{
+    font-size:1.03rem;
+    line-height:1.75;
+    color:rgba(244,248,252,0.9);
+    margin:0 0 16px;
+  }
+  .about-stats{
+    display:flex;
+    gap:26px;
+    margin-top:28px;
+    flex-wrap:wrap;
+  }
+  .stat b{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:1.7rem;
+    display:block;
+    color:var(--sunset-amber);
+  }
+  .stat span{
+    font-size:0.8rem;
+    color:rgba(244,248,252,0.65);
+  }
+
+  /* code panel signature element */
+  .code-panel{
+    padding:0;
+    overflow:hidden;
+    font-family:'JetBrains Mono', monospace;
+    display:flex;
+    flex-direction:column;
+  }
+  .code-topbar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:14px 18px;
+    background:rgba(0,0,0,0.22);
+    border-bottom:1px solid var(--glass-border);
+  }
+  .code-topbar .dot{ width:10px; height:10px; border-radius:50%; }
+  .dot.r{background:#E8785A;} .dot.y{background:#F2A65A;} .dot.g{background:#8FB8D9;}
+  .code-topbar span{
+    margin-left:10px;
+    font-size:0.75rem;
+    opacity:0.6;
+  }
+  .code-body{
+    padding:22px 20px;
+    font-size:0.86rem;
+    line-height:1.75;
+    overflow-x:auto;
+    flex:1;
+  }
+  .c-kw{ color:#8FB8D9; } .c-fn{ color:#F2A65A; } .c-str{ color:#9FD9A8; }
+  .c-com{ color:rgba(244,248,252,0.42); } .c-var{ color:#E8785A; }
+
+  /* ---------- WORK / GAMES ---------- */
+  .games-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:24px;
+  }
+  @media (max-width:900px){ .games-grid{ grid-template-columns:1fr; } }
+  .game-card{
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    transition:transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .game-card:hover{ transform:translateY(-6px); box-shadow:0 26px 70px rgba(0,0,0,0.35); }
+  .game-thumb{
+    height:170px;
+    background-size:cover;
+    background-position:center;
+    position:relative;
+  }
+  .game-thumb .badge{
+    position:absolute;
+    top:12px; right:12px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.68rem;
+    padding:5px 10px;
+    border-radius:20px;
+    background:rgba(11,18,32,0.7);
+    border:1px solid var(--glass-border);
+    letter-spacing:0.04em;
+  }
+  .badge.live{ color:#9FD9A8; }
+  .badge.gone{ color:#E8785A; }
+  .game-thumb.placeholder{
+    background:linear-gradient(135deg, rgba(143,184,217,0.25), rgba(232,120,90,0.2));
+    display:flex; align-items:center; justify-content:center;
+  }
+  .game-thumb.placeholder .cubes{ display:flex; gap:5px; }
+  .game-thumb.placeholder .cubes span{
+    width:14px; height:14px; background:rgba(244,248,252,0.5); border-radius:3px;
+  }
+  .game-body{ padding:22px; flex:1; display:flex; flex-direction:column; }
+  .game-body h3{ font-size:1.15rem; margin-bottom:8px; }
+  .game-body p{
+    font-size:0.9rem;
+    line-height:1.6;
+    color:rgba(244,248,252,0.82);
+    flex:1;
+  }
+  .game-tags{ display:flex; flex-wrap:wrap; gap:6px; margin:14px 0; }
+  .game-tags span{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.68rem;
+    padding:4px 9px;
+    border-radius:20px;
+    border:1px solid var(--glass-border);
+    color:rgba(244,248,252,0.7);
+  }
+  .game-link{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:0.85rem;
+    text-decoration:none;
+    color:var(--sunset-amber);
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-top:auto;
+  }
+  .game-link.disabled{ color:rgba(244,248,252,0.4); cursor:default; }
+  .game-link svg{ width:13px; height:13px; }
+
+  /* ---------- YOUTUBE ---------- */
+  .yt-panel{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0;
+    overflow:hidden;
+  }
+  @media (max-width:860px){ .yt-panel{ grid-template-columns:1fr; } }
+  .yt-copy{ padding:44px; display:flex; flex-direction:column; justify-content:center; }
+  .yt-copy p{ line-height:1.75; color:rgba(244,248,252,0.88); margin:14px 0 24px; }
+  .yt-visual{
+    background:linear-gradient(160deg, rgba(232,120,90,0.35), rgba(20,35,59,0.6));
+    display:flex; align-items:center; justify-content:center;
+    padding:40px;
+    min-height:260px;
+    position:relative;
+  }
+  .yt-play{
+    width:78px; height:78px;
+    border-radius:50%;
+    background:rgba(244,248,252,0.95);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 10px 40px rgba(0,0,0,0.35);
+  }
+  .yt-play svg{ width:26px; height:26px; fill:#E8785A; margin-left:4px; }
+
+  /* ---------- SOCIALS / FOOTER ---------- */
+  .socials{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+  }
+  @media (max-width:760px){ .socials{ grid-template-columns:1fr; } }
+  .social-card{
+    padding:30px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    text-decoration:none;
+    transition:transform 0.2s ease, background 0.2s ease;
+  }
+  .social-card:hover{ transform:translateY(-4px); background:rgba(20,35,59,0.6); }
+  .social-icon{
+    width:52px; height:52px;
+    border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .social-icon.yt{ background:rgba(232,120,90,0.25); }
+  .social-icon.dc{ background:rgba(143,184,217,0.25); }
+  .social-icon svg{ width:24px; height:24px; fill:var(--frost-white); }
+  .social-card h3{ font-size:1.05rem; margin-bottom:4px; }
+  .social-card p{ font-size:0.85rem; color:rgba(244,248,252,0.65); margin:0; }
+  .social-card .go{ margin-left:auto; opacity:0.5; }
+
+  footer{
+    text-align:center;
+    padding:50px 6vw 70px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    color:rgba(244,248,252,0.5);
+  }
+
+  /* ---------- MUSIC TOGGLE ---------- */
+  #music-toggle{
+    position:fixed;
+    bottom:24px; right:24px;
+    z-index:60;
+    width:56px; height:56px;
+    border-radius:50%;
+    border:1px solid var(--glass-border);
+    background:rgba(20,35,59,0.6);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    transition:transform 0.2s ease;
+  }
+  #music-toggle:hover{ transform:scale(1.07); }
+  #music-toggle svg{ width:22px; height:22px; fill:var(--frost-white); }
+  #music-toggle.playing svg.bars rect{ animation:eq 0.9s ease-in-out infinite; }
+  #music-toggle .bars rect:nth-child(2){ animation-delay:0.15s; }
+  #music-toggle .bars rect:nth-child(3){ animation-delay:0.3s; }
+  @keyframes eq{ 0%,100%{ transform:scaleY(0.4);} 50%{ transform:scaleY(1);} }
+  #yt-audio{ position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; overflow:hidden; }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    #music-toggle.playing svg.bars rect{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-fixed"></div>
+<div class="bg-overlay"></div>
+
+<nav>
+  <div class="brand">freaky<span>kaka</span></div>
+  <div class="nav-links">
+    <a href="#about">about</a>
+    <a href="#work">work</a>
+    <a href="#devlogs">devlogs</a>
+    <a href="#socials">socials</a>
+  </div>
+  <div class="nav-icons">
+    <a href="https://www.youtube.com/@freakykaka" target="_blank" rel="noopener" aria-label="YouTube">
+      <svg viewBox="0 0 24 24"><path d="M23.5 6.2s-.23-1.64-.94-2.36c-.9-.94-1.9-.95-2.36-1C17 2.5 12 2.5 12 2.5h-.01s-5 0-8.19.34c-.46.05-1.46.06-2.36 1C.74 4.56.5 6.2.5 6.2S.25 8.13.25 10.07v1.86c0 1.94.25 3.87.25 3.87s.24 1.64.94 2.36c.9.97 2.08.94 2.6 1.04C5.9 19.34 12 19.4 12 19.4s5.01-.01 8.2-.35c.46-.06 1.46-.07 2.36-1 .71-.72.94-2.36.94-2.36s.25-1.93.25-3.87v-1.86c0-1.94-.25-3.87-.25-3.87ZM9.55 14.15V7.85l6.27 3.15-6.27 3.15Z"/></svg>
+    </a>
+    <a href="https://discord.com/users/839824724599242763" target="_blank" rel="noopener" aria-label="Discord">
+      <svg viewBox="0 0 24 24"><path d="M20.32 4.5A18.6 18.6 0 0 0 15.9 3.1c-.2.35-.42.82-.58 1.2a17.2 17.2 0 0 0-5.65 0c-.16-.38-.4-.85-.6-1.2A18.5 18.5 0 0 0 4.65 4.5C1.9 8.5 1.15 12.4 1.5 16.24a18.7 18.7 0 0 0 5.7 2.87c.46-.63.87-1.3 1.2-2a12 12 0 0 1-1.9-.92c.16-.12.32-.24.47-.37a13.3 13.3 0 0 0 11.5 0c.15.13.31.25.47.37a12 12 0 0 1-1.91.92c.35.7.75 1.37 1.21 2a18.6 18.6 0 0 0 5.7-2.87c.42-4.45-.72-8.32-3.62-11.74ZM9.02 13.9c-.86 0-1.56-.8-1.56-1.77 0-.98.68-1.78 1.56-1.78.89 0 1.58.81 1.56 1.78 0 .97-.68 1.77-1.56 1.77Zm5.98 0c-.86 0-1.56-.8-1.56-1.77 0-.98.68-1.78 1.56-1.78.89 0 1.57.81 1.56 1.78 0 .97-.67 1.77-1.56 1.77Z"/></svg>
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">
+    <span class="eyebrow">roblox studio dev · scripting</span>
+  </div>
+  <h1>hey, i'm<br><span class="accent">kaka</span></h1>
+  <div class="cube-row"><span></span><span></span><span></span></div>
+  <p class="hero-sub">i build systems in Roblox Studio 3 years deep in Luau, from jail roleplay games to retro cooking sims. i also make devlogs on YouTube where i actually show the scripting, not just the finished product.</p>
+  <div class="hero-ctas">
+    <a class="btn btn-primary" href="#work">see what i've built</a>
+    <a class="btn btn-ghost" href="https://www.youtube.com/@freakykaka" target="_blank" rel="noopener">watch devlogs</a>
+  </div>
+  <div class="scroll-hint"><span class="line"></span> scroll down</div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-head">
+    <span class="eyebrow">about</span>
+    <h2>i script the stuff that actually makes a game work</h2>
+  </div>
+  <div class="about-grid">
+    <div class="glass about-copy">
+      <p>i've been scripting in Roblox Studio for about 3 years now. started out messing with kill bricks and basic GUIs like everyone else, and ended up building full game systems job/role setups, save data, custom tools, gate and wiring logic, you name it.</p>
+      <p>i work on live games that people actually play, not just demos sitting in a Studio file. i also run a YouTube channel where I post devlogs and the occasional tutorial, because I think showing the actual scripting process is way more useful than another "top 10 scripts" video.</p>
+      <div class="about-stats">
+        <div class="stat"><b>3 yrs</b><span>scripting in Studio</span></div>
+        <div class="stat"><b>2</b><span>live games shipped</span></div>
+        <div class="stat"><b>1</b><span>YouTube channel, devlogs + tutorials</span></div>
+      </div>
+    </div>
+    <div class="glass code-panel">
+      <div class="code-topbar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <span>JailSystems.lua</span>
+      </div>
+      <div class="code-body">
+<span class="c-com">-- correctional officer role, part of the jail's</span><br>
+<span class="c-com">-- job system. real snippet-style example</span><br>
+<span class="c-kw">local</span> <span class="c-var">Jobs</span> = <span class="c-fn">require</span>(<span class="c-str">script.Parent.JobConfig</span>)<br>
+<span class="c-kw">local</span> <span class="c-var">DataStore</span> = <span class="c-fn">game</span>:<span class="c-fn">GetService</span>(<span class="c-str">"DataStoreService"</span>)<br>
+<br>
+<span class="c-kw">local function</span> <span class="c-fn">assignJob</span>(<span class="c-var">player</span>, <span class="c-var">jobName</span>)<br>
+&nbsp;&nbsp;<span class="c-kw">local</span> <span class="c-var">job</span> = <span class="c-var">Jobs</span>[<span class="c-var">jobName</span>]<br>
+&nbsp;&nbsp;<span class="c-kw">if not</span> <span class="c-var">job</span> <span class="c-kw">then return</span> <span class="c-kw">end</span><br>
+<br>
+&nbsp;&nbsp;<span class="c-var">player</span>:<span class="c-fn">SetAttribute</span>(<span class="c-str">"Job"</span>, <span class="c-var">jobName</span>)<br>
+&nbsp;&nbsp;<span class="c-fn">giveTools</span>(<span class="c-var">player</span>, <span class="c-var">job</span>.tools)<br>
+&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-var">player</span>.Name .. <span class="c-str">" is now a "</span> .. <span class="c-var">jobName</span>)<br>
+<span class="c-kw">end</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK / GAMES -->
+<section id="work">
+  <div class="section-head">
+    <span class="eyebrow">work</span>
+    <h2>games i've scripted on</h2>
+  </div>
+  <div class="games-grid">
+
+    <div class="glass game-card">
+      <div class="game-thumb" style="background-image:url('https://tr.rbxcdn.com/180DAY-b4d10587b1925a463e8039501c5bb8ee/500/280/Image/Jpeg/noFilter');">
+        <span class="badge live">● live</span>
+      </div>
+      <div class="game-body">
+        <h3>Dupoint County Jail</h3>
+        <p>A prison roleplay game pick a side as a correctional officer, doctor, maintenance tech, or a criminal trying to break out. Actively updated, with systems like gate wiring and a maintenance tablet that I built out.</p>
+        <div class="game-tags"><span>roleplay</span><span>live ops</span><span>job systems</span></div>
+        <a class="game-link" href="https://www.roblox.com/games/101287173716977/Dupoint-County-Jail" target="_blank" rel="noopener">play on roblox
+          <svg viewBox="0 0 24 24"><path d="M7 17 17 7M17 7H9M17 7v8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="glass game-card">
+      <div class="game-thumb" style="background-image:url('https://tr.rbxcdn.com/180DAY-a62bf3de64e51240bac08257a97853d3/500/280/Image/Jpeg/noFilter');">
+        <span class="badge live">● live</span>
+      </div>
+      <div class="game-body">
+        <h3>Studs And Spuds</h3>
+        <p>A retro, 2009-vibes burger shop sim. Take orders, build ridiculous burgers, keep the customers (including the occasional Karen) happy, and climb the leaderboard. Multiplayer co-op cooking is in the works.</p>
+        <div class="game-tags"><span>simulator</span><span>retro</span><span>cooking</span></div>
+        <a class="game-link" href="https://www.roblox.com/games/117575812184390/Studs-And-Spuds" target="_blank" rel="noopener">play on roblox
+          <svg viewBox="0 0 24 24"><path d="M7 17 17 7M17 7H9M17 7v8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="glass game-card">
+      <div class="game-thumb placeholder">
+        <span class="badge gone">taken down</span>
+        <div class="cubes"><span></span><span></span><span></span></div>
+      </div>
+      <div class="game-body">
+        <h3>BoomBattles</h3>
+        <p>Boom Battles was a fast paced rivals like pvp game were you would throw grenades and fight.</p>
+        <div class="game-tags"><span>no one likes roblox moderation</span><span>archived</span></div>
+        <span class="game-link disabled">no longer live</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- YOUTUBE / DEVLOGS -->
+<section id="devlogs">
+  <div class="section-head">
+    <span class="eyebrow">devlogs</span>
+    <h2>i film the scripting, not just the result</h2>
+  </div>
+  <div class="glass yt-panel">
+    <div class="yt-copy">
+      <span class="eyebrow">@freakykaka</span>
+      <p>My channel is mostly devlogs building systems out from scratch, on camera, mistakes included. There's also a couple of straight-up tutorials where I walk through how I actually script things, if you want to learn instead of just watch.</p>
+      <div class="hero-ctas" style="margin-top:0;">
+        <a class="btn btn-primary" href="https://www.youtube.com/@freakykaka" target="_blank" rel="noopener">go to channel</a>
+      </div>
+    </div>
+    <a class="yt-visual" href="https://www.youtube.com/@freakykaka" target="_blank" rel="noopener" aria-label="Open YouTube channel">
+      <div class="yt-play">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7Z"/></svg>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- SOCIALS -->
+<section id="socials">
+  <div class="section-head">
+    <span class="eyebrow">socials</span>
+    <h2>come say hi</h2>
+  </div>
+  <div class="socials">
+    <a class="glass social-card" href="https://www.youtube.com/@freakykaka" target="_blank" rel="noopener">
+      <div class="social-icon yt">
+        <svg viewBox="0 0 24 24"><path d="M23.5 6.2s-.23-1.64-.94-2.36c-.9-.94-1.9-.95-2.36-1C17 2.5 12 2.5 12 2.5h-.01s-5 0-8.19.34c-.46.05-1.46.06-2.36 1C.74 4.56.5 6.2.5 6.2S.25 8.13.25 10.07v1.86c0 1.94.25 3.87.25 3.87s.24 1.64.94 2.36c.9.97 2.08.94 2.6 1.04C5.9 19.34 12 19.4 12 19.4s5.01-.01 8.2-.35c.46-.06 1.46-.07 2.36-1 .71-.72.94-2.36.94-2.36s.25-1.93.25-3.87v-1.86c0-1.94-.25-3.87-.25-3.87ZM9.55 14.15V7.85l6.27 3.15-6.27 3.15Z"/></svg>
+      </div>
+      <div>
+        <h3>YouTube</h3>
+        <p>@freakykaka — devlogs & scripting tutorials</p>
+      </div>
+      <span class="go">↗</span>
+    </a>
+    <a class="glass social-card" href="https://discord.com/users/839824724599242763" target="_blank" rel="noopener">
+      <div class="social-icon dc">
+        <svg viewBox="0 0 24 24"><path d="M20.32 4.5A18.6 18.6 0 0 0 15.9 3.1c-.2.35-.42.82-.58 1.2a17.2 17.2 0 0 0-5.65 0c-.16-.38-.4-.85-.6-1.2A18.5 18.5 0 0 0 4.65 4.5C1.9 8.5 1.15 12.4 1.5 16.24a18.7 18.7 0 0 0 5.7 2.87c.46-.63.87-1.3 1.2-2a12 12 0 0 1-1.9-.92c.16-.12.32-.24.47-.37a13.3 13.3 0 0 0 11.5 0c.15.13.31.25.47.37a12 12 0 0 1-1.91.92c.35.7.75 1.37 1.21 2a18.6 18.6 0 0 0 5.7-2.87c.42-4.45-.72-8.32-3.62-11.74ZM9.02 13.9c-.86 0-1.56-.8-1.56-1.77 0-.98.68-1.78 1.56-1.78.89 0 1.58.81 1.56 1.78 0 .97-.68 1.77-1.56 1.77Zm5.98 0c-.86 0-1.56-.8-1.56-1.77 0-.98.68-1.78 1.56-1.78.89 0 1.57.81 1.56 1.78 0 .97-.67 1.77-1.56 1.77Z"/></svg>
+      </div>
+      <div>
+        <h3>Discord</h3>
+        <p>Message me directly — open my profile</p>
+      </div>
+      <span class="go">↗</span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  built with much luv · freakykaka © 2026
+</footer>
+
+<!-- MUSIC TOGGLE -->
+<button id="music-toggle" aria-label="Toggle background music">
+  <svg class="bars" viewBox="0 0 24 24">
+    <rect x="4" y="9" width="3" height="6" rx="1"></rect>
+    <rect x="10.5" y="5" width="3" height="14" rx="1"></rect>
+    <rect x="17" y="11" width="3" height="4" rx="1"></rect>
+  </svg>
+</button>
+<div id="yt-audio"><div id="yt-player"></div></div>
+
+<script>
+  
+  var player;
+  var ytReady = false;
+  var wantsPlay = false;
+
+  var tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.body.appendChild(tag);
+
+  window.onYouTubeIframeAPIReady = function() {
+    player = new YT.Player('yt-player', {
+      height: '1', width: '1',
+      videoId: 'rm7UdTLKt5Y',
+      playerVars: {
+        autoplay: 0, controls: 0, loop: 1, playlist: 'rm7UdTLKt5Y'
+      },
+      events: {
+        'onReady': function(){
+          ytReady = true;
+          player.setVolume(45);
+          if (wantsPlay) player.playVideo();
+        }
+      }
+    });
+  };
+
+  var toggle = document.getElementById('music-toggle');
+  var playing = false;
+  toggle.addEventListener('click', function(){
+    playing = !playing;
+    toggle.classList.toggle('playing', playing);
+    if (playing) {
+      wantsPlay = true;
+      if (ytReady) player.playVideo();
+    } else {
+      if (ytReady) player.pauseVideo();
+    }
+  });
+</script>
+
+</body>
+</html>
