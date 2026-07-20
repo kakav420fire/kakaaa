@@ -442,7 +442,6 @@
   #music-toggle .bars rect:nth-child(2){ animation-delay:0.15s; }
   #music-toggle .bars rect:nth-child(3){ animation-delay:0.3s; }
   @keyframes eq{ 0%,100%{ transform:scaleY(0.4);} 50%{ transform:scaleY(1);} }
-  #yt-audio{ position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; overflow:hidden; }
 
   @media (prefers-reduced-motion: reduce){
     html{ scroll-behavior:auto; }
@@ -480,7 +479,7 @@
   </div>
   <h1>hey, i'm<br><span class="accent">kaka</span></h1>
   <div class="cube-row"><span></span><span></span><span></span></div>
-  <p class="hero-sub">i build systems in Roblox Studio 3 years deep in Luau, from jail roleplay games to retro cooking sims. i also make devlogs on YouTube where i actually show the scripting, not just the finished product.</p>
+  <p class="hero-sub">i build systems in Roblox Studio — 3 years deep in Luau, from jail roleplay games to retro cooking sims. i also make devlogs on YouTube where i actually show the scripting, not just the finished product.</p>
   <div class="hero-ctas">
     <a class="btn btn-primary" href="#work">see what i've built</a>
     <a class="btn btn-ghost" href="https://www.youtube.com/@freakykaka" target="_blank" rel="noopener">watch devlogs</a>
@@ -496,7 +495,7 @@
   </div>
   <div class="about-grid">
     <div class="glass about-copy">
-      <p>i've been scripting in Roblox Studio for about 3 years now. started out messing with kill bricks and basic GUIs like everyone else, and ended up building full game systems job/role setups, save data, custom tools, gate and wiring logic, you name it.</p>
+      <p>i've been scripting in Roblox Studio for about 3 years now. started out messing with kill bricks and basic GUIs like everyone else, and ended up building full game systems — job/role setups, save data, custom tools, gate and wiring logic, you name it.</p>
       <p>i work on live games that people actually play, not just demos sitting in a Studio file. i also run a YouTube channel where I post devlogs and the occasional tutorial, because I think showing the actual scripting process is way more useful than another "top 10 scripts" video.</p>
       <div class="about-stats">
         <div class="stat"><b>3 yrs</b><span>scripting in Studio</span></div>
@@ -542,7 +541,7 @@
       </div>
       <div class="game-body">
         <h3>Dupoint County Jail</h3>
-        <p>A prison roleplay game pick a side as a correctional officer, doctor, maintenance tech, or a criminal trying to break out. Actively updated, with systems like gate wiring and a maintenance tablet that I built out.</p>
+        <p>A prison roleplay game — pick a side as a correctional officer, doctor, maintenance tech, or a criminal trying to break out. Actively updated, with systems like gate wiring and a maintenance tablet that I built out.</p>
         <div class="game-tags"><span>roleplay</span><span>live ops</span><span>job systems</span></div>
         <a class="game-link" href="https://www.roblox.com/games/101287173716977/Dupoint-County-Jail" target="_blank" rel="noopener">play on roblox
           <svg viewBox="0 0 24 24"><path d="M7 17 17 7M17 7H9M17 7v8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -589,7 +588,7 @@
   <div class="glass yt-panel">
     <div class="yt-copy">
       <span class="eyebrow">@freakykaka</span>
-      <p>My channel is mostly devlogs building systems out from scratch, on camera, mistakes included. There's also a couple of straight-up tutorials where I walk through how I actually script things, if you want to learn instead of just watch.</p>
+      <p>My channel is mostly devlogs — building systems out from scratch, on camera, mistakes included. There's also a couple of straight-up tutorials where I walk through how I actually script things, if you want to learn instead of just watch.</p>
       <div class="hero-ctas" style="margin-top:0;">
         <a class="btn btn-primary" href="https://www.youtube.com/@freakykaka" target="_blank" rel="noopener">go to channel</a>
       </div>
@@ -644,45 +643,25 @@
     <rect x="17" y="11" width="3" height="4" rx="1"></rect>
   </svg>
 </button>
-<div id="yt-audio"><div id="yt-player"></div></div>
+<audio id="bg-music" src="music.mp3" loop preload="none"></audio>
 
 <script>
-  
-  var player;
-  var ytReady = false;
-  var wantsPlay = false;
-
-  var tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  document.body.appendChild(tag);
-
-  window.onYouTubeIframeAPIReady = function() {
-    player = new YT.Player('yt-player', {
-      height: '1', width: '1',
-      videoId: 'rm7UdTLKt5Y',
-      playerVars: {
-        autoplay: 0, controls: 0, loop: 1, playlist: 'rm7UdTLKt5Y'
-      },
-      events: {
-        'onReady': function(){
-          ytReady = true;
-          player.setVolume(45);
-          if (wantsPlay) player.playVideo();
-        }
-      }
-    });
-  };
-
+  var audio = document.getElementById('bg-music');
   var toggle = document.getElementById('music-toggle');
   var playing = false;
+
   toggle.addEventListener('click', function(){
-    playing = !playing;
-    toggle.classList.toggle('playing', playing);
-    if (playing) {
-      wantsPlay = true;
-      if (ytReady) player.playVideo();
+    if (!playing) {
+      audio.play().then(function(){
+        playing = true;
+        toggle.classList.add('playing');
+      }).catch(function(err){
+        console.error('Could not play music.mp3 — make sure it sits next to index.html', err);
+      });
     } else {
-      if (ytReady) player.pauseVideo();
+      audio.pause();
+      playing = false;
+      toggle.classList.remove('playing');
     }
   });
 </script>
