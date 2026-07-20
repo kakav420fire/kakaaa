@@ -447,12 +447,90 @@
     html{ scroll-behavior:auto; }
     #music-toggle.playing svg.bars rect{ animation:none; }
   }
+
+  /* ---------- ENTRY SCREEN ---------- */
+  body.locked{ overflow:hidden; height:100vh; }
+  .site-content{
+    filter:blur(22px) saturate(1.15);
+    transform:scale(1.04);
+    transition:filter 1.1s cubic-bezier(.2,.7,.2,1), transform 1.1s cubic-bezier(.2,.7,.2,1);
+    pointer-events:none;
+  }
+  .site-content.revealed{
+    filter:blur(0) saturate(1);
+    transform:scale(1);
+    pointer-events:auto;
+  }
+  #entry-screen{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+    cursor:pointer;
+    background:rgba(11,18,32,0.3);
+    transition:opacity 0.9s ease;
+    text-align:center;
+    padding:0 24px;
+  }
+  #entry-screen.hidden{
+    opacity:0;
+    pointer-events:none;
+  }
+  .entry-icon{
+    width:20px; height:20px;
+    background:var(--sunset-amber);
+    border-radius:4px;
+    transform:rotate(45deg);
+    margin-bottom:6px;
+    animation:entry-float 2.6s ease-in-out infinite;
+  }
+  @keyframes entry-float{
+    0%,100%{ transform:rotate(45deg) translateY(0); }
+    50%{ transform:rotate(45deg) translateY(-8px); }
+  }
+  #entry-screen h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:clamp(1.6rem, 5vw, 2.8rem);
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    font-weight:700;
+    color:var(--frost-white);
+    animation:glow-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes glow-pulse{
+    0%,100%{ text-shadow:0 0 18px rgba(242,166,90,0.55), 0 0 46px rgba(232,120,90,0.3); }
+    50%{ text-shadow:0 0 32px rgba(242,166,90,1), 0 0 84px rgba(232,120,90,0.65); }
+  }
+  #entry-screen p{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    letter-spacing:0.05em;
+    color:rgba(244,248,252,0.6);
+    margin:0;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .site-content{ transition:none; }
+    #entry-screen{ transition:none; }
+    .entry-icon, #entry-screen h2{ animation:none; }
+  }
 </style>
 </head>
 <body>
 
 <div class="bg-fixed"></div>
 <div class="bg-overlay"></div>
+
+<div id="entry-screen">
+  <div class="entry-icon"></div>
+  <h2>click to enter</h2>
+  <p>sound on · devlogs, games & socials inside</p>
+</div>
+
+<div class="site-content">
 
 <nav>
   <div class="brand">freaky<span>kaka</span></div>
@@ -643,24 +721,44 @@
     <rect x="17" y="11" width="3" height="4" rx="1"></rect>
   </svg>
 </button>
-<audio id="bg-music" src="music.mp3" loop preload="none"></audio>
+<audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
+
+</div><!-- /.site-content -->
 
 <script>
   var audio = document.getElementById('bg-music');
   var toggle = document.getElementById('music-toggle');
-  var playing = false;
+  var entryScreen = document.getElementById('entry-screen');
+  var siteContent = document.querySelector('.site-content');
 
-  toggle.addEventListener('click', function(){
-    if (!playing) {
-      audio.play().then(function(){
-        playing = true;
-        toggle.classList.add('playing');
-      }).catch(function(err){
-        console.error('Could not play music.mp3 — make sure it sits next to index.html', err);
-      });
+  document.body.classList.add('locked');
+
+  // The "click to enter" tap IS the user gesture browsers require before
+  // audio can play with sound — so this is a clean, reliable way to start
+  // the music, no autoplay hacks needed.
+  entryScreen.addEventListener('click', function enter(){
+    audio.play().then(function(){
+      toggle.classList.add('playing');
+    }).catch(function(err){
+      console.error('Could not play music.mp3', err);
+    });
+
+    entryScreen.classList.add('hidden');
+    siteContent.classList.add('revealed');
+    document.body.classList.remove('locked');
+
+    entryScreen.removeEventListener('click', enter);
+    setTimeout(function(){ entryScreen.remove(); }, 1000);
+  });
+
+  // Floating button stays as a manual mute/unmute toggle after entry.
+  toggle.addEventListener('click', function(e){
+    e.stopPropagation();
+    if (audio.muted || audio.paused) {
+      audio.muted = false;
+      audio.play().then(function(){ toggle.classList.add('playing'); });
     } else {
-      audio.pause();
-      playing = false;
+      audio.muted = true;
       toggle.classList.remove('playing');
     }
   });
